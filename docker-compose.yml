@@ -1,33 +1,51 @@
-version: 3
+version: '3.8'
 
 services:
   api:
+    tty: true
     build: .
     ports:
-      - 3000:3000
+      - ${HOST_PORT}:3000
     volumes:
-      - .:/usr/src/app
+      - .:/app
     env_file:
       - .env
     depends_on:
       - mysql
+    networks:
+      - common_network
 
   mysql:
     image: mysql:8.0
     ports:
-      - 3306:3306
+      - ${MYSQL_PORT}:3306
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
     volumes:
       - ./data:/var/lib/mysql
-    env_file:
-      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_HOST=%
+      - TZ=Asia/Kolkata
+    networks:
+      - common_network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    restart: always
     ports:
       - 8080:80
     depends_on:
       - mysql
-    env_file:
-      - .env
     environment:
-      PMA_HOST: mysql
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+      - UPLOAD_LIMIT=3000000000
+      - TZ=Asia/Kolkata
+    networks:
+      - common_network
+
+networks:
+  common_network:
+    name: common_network
