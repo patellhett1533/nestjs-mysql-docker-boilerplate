@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import config from 'lib/db.config';
+import config from '../lib/db.config';
 import { AppLogger } from './app.logger';
 
 @Module({

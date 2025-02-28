@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   api:
+    container_name: ${PROJECT}_api
     tty: true
     build: .
     ports:
@@ -16,6 +17,7 @@ services:
       - common_network
 
   mysql:
+    container_name: ${PROJECT}_mysql
     image: mysql:8.0
     ports:
       - ${MYSQL_PORT}:3306
@@ -31,6 +33,7 @@ services:
       - common_network
 
   phpmyadmin:
+    container_name: ${PROJECT}_phpmyadmin
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
