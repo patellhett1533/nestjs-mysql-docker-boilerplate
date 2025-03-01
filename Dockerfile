@@ -10,8 +10,4 @@ COPY . .
 
 EXPOSE 3000
 
-# for development only
 CMD ["npm", "run", "start:dev"]
-
-# for production only
-# CMD ["npm", "run", "start:prod"]
