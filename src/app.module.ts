@@ -5,9 +5,10 @@ import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import config from "./shared/config/db.config";
 import { AppLogger } from "./app.logger";
 import { UsersModule } from "./users/users.module";
+import { TokenModule } from './token/token.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(config as TypeOrmModuleOptions), UsersModule],
+  imports: [TypeOrmModule.forRoot(config as TypeOrmModuleOptions), UsersModule, TokenModule],
   controllers: [AppController],
   providers: [AppService],
 })
