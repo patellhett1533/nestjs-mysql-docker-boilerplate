@@ -4,11 +4,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "./users.entity";
 import { Repository } from "typeorm";
 import { CreateUser } from "./users.interface";
+import { CryptoService } from "src/shared/lib/utility";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class UsersService {
   constructor(
     private jwtService: JwtService,
+    private configService: ConfigService,
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
@@ -28,20 +31,32 @@ export class UsersService {
 
   async loginUserWithEmail(email: string, password: string): Promise<any> {
     const user = await this.usersRepository.findOne({
-      where: { email: email },
+      where: { email },
     });
 
     if (!user) {
       throw new BadRequestException("User not found");
     }
 
-    if (user.password !== password) {
-      throw new BadRequestException("Invalid password");
+    if (!CryptoService.comparePassword(password, user.password)) {
+      throw new BadRequestException("Invalid email or password");
     }
 
     const payload = { email: user.email, sub: user.id };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>("ACCESS_TOKEN_SECRET"),
+      expiresIn: "15m",
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>("REFRESH_TOKEN_SECRET"),
+      expiresIn: "7d",
+    });
     return {
-      access_token: this.jwtService.sign(payload),
+      user: user,
+      token: {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      },
     };
   }
 }
